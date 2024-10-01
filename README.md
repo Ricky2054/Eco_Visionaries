@@ -97,6 +97,6 @@ To run the project in your localserver
 ## Authors
 
 - [@Sorbojit Mondal](https://github.com/33sorbojitmondal)
-- [@Ricky](https://github.com/Ricky2054)
-- [@Sagarika](https://github.com/anuragcode-16)
+- [@Ricky Dey](https://github.com/Ricky2054)
+- [@Anurag Dey](https://github.com/anuragcode-16)
 
