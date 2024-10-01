@@ -1,0 +1,241 @@
+{% extends '../blocks/base.html' %}
+
+{% block title %}AQI{% endblock title %}
+
+{% block links %}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+crossorigin=""></script>
+{% endblock links %}
+
+
+{% block body %}
+
+<header class="flex items-center justify-between w-full py-2 px-4 bg-white z-50">
+    <div class="w-20">
+      <a href="/">
+        <img src="/static/images/EcoVisionary-logo.png" class="w-full" alt="Eco Visionary">
+      </a>
+    </div>
+    <form method="get" class="flex items-center justify-center rounded-2xl w-96 h-12 bg-gray-200 py-3.5 px-3">
+        <i class="fa fa-search text-my-blue"></i>
+        <input type="text" class="font-noto outline-none border-none w-full h-12 bg-transparent ml-2" placeholder="Search for cities in India...">
+    </form>
+    <div>
+        <div class="flex">
+            {% if user.is_authenticated%}
+            {% if user.first_name != "" %}
+            <div class="font-noto mr-5 relative -top-1.5">
+                <p class="text-xs">Welcome</p>
+                <p class="font-bold">{{user.first_name}}</p>
+            </div>
+            {% endif %}
+            <div>
+                <a href="{% url 'logout' %}" class="bg-my-blue hover:bg-my-blue-hover transition-colors duration-300 text-white px-3.5 py-2.5 rounded font-noto font-bold">Logout</a>
+            </div>
+            {% else %}
+            <a href="{% url 'signup' %}" class="bg-my-blue hover:bg-my-blue-hover transition-colors duration-300 text-white px-3.5 py-2.5 rounded font-noto font-bold">Signup</a>
+            <a href="{% url 'login' %}" class="ml-2 bg-my-blue hover:bg-my-blue-hover transition-colors duration-300 text-white px-3.5 py-2.5 rounded font-noto font-bold">Login</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+<section class="flex items-center justify-between font-noto bg-blue-300 px-6 py-3 shadow-md">
+    <div class="flex">
+        <select class="w-48 p-2.5 rounded-l text-xl border-none outline-none cursor-pointer">
+            <option value="wb" class="p-1.5 capitalize">West Bengal</option>
+        </select>
+        <div class="rounded-r bg-blue-600 py-2.5 px-3.5">
+            <span class="text-xl text-white">State</span>
+        </div>
+    </div>
+    <div>
+        <span class="text-xl font-bold">
+             Indian Standard AQI
+        </span>
+    </div>
+    <div class="flex">
+        <select id="select_city" class="w-48 p-2.5 rounded-l text-xl border-none outline-none cursor-not-allowed" style="max-height: 55%;" disabled>
+            <option value="alipurduar" class="p-1.5 capitalize">Alipurduar</option>
+            <option value="asansol" class="p-1.5 capitalize">Asansol</option>
+            <option value="baharampur" class="p-1.5 capitalize">Baharampur</option>
+            <option value="bally" class="p-1.5 capitalize">Bally</option>
+            <option value="balurghat" class="p-1.5 capitalize">Balurghat</option>
+            <option value="bangaon" class="p-1.5 capitalize">Bangaon</option>
+            <option value="bankura" class="p-1.5 capitalize">Bankura</option>
+            <option value="bardhaman" class="p-1.5 capitalize">Bardhaman</option>
+            <option value="basirhat" class="p-1.5 capitalize">Basirhat</option>
+            <option value="bolpur" class="p-1.5 capitalize">Bolpur</option>
+            <option value="chakdaha" class="p-1.5 capitalize">Chakdaha</option>
+            <option value="cooch behar" class="p-1.5 capitalize">Cooch Behar</option>
+            <option value="dankuni" class="p-1.5 capitalize">Dankuni</option>
+            <option value="darjeeling" class="p-1.5 capitalize">Darjeeling</option>
+            <option value="dhulian" class="p-1.5 capitalize">Dhulian</option>
+            <option value="durgapur" class="p-1.5 capitalize">Durgapur</option>
+            <option value="habra" class="p-1.5 capitalize">Habra</option>
+            <option value="haldia" class="p-1.5 capitalize">Haldia</option>
+            <option value="jalpaiguri" class="p-1.5 capitalize">Jalpaiguri</option>
+            <option value="jangipur" class="p-1.5 capitalize">Jangipur</option>
+            <option value="kharagpur" class="p-1.5 capitalize">Kharagpur</option>
+            <option value="kolkata" class="p-1.5 capitalize">Kolkata</option>
+            <option value="krishnanagar" class="p-1.5 capitalize">Krishnanagar</option>
+            <option value="malda" class="p-1.5 capitalize">Malda</option>
+            <option value="medinipur" class="p-1.5 capitalize">Medinipur</option>
+            <option value="nabadwip" class="p-1.5 capitalize">Nabadwip</option>
+            <option value="purulia" class="p-1.5 capitalize">Purulia</option>
+            <option value="ranaghat" class="p-1.5 capitalize">Ranaghat</option>
+            <option value="shantipur" class="p-1.5 capitalize">Shantipur</option>
+            <option value="siliguri" class="p-1.5 capitalize">Siliguri</option>
+            <option value="asansol" class="p-1.5 capitalize">Asansol</option>
+            <option value="barrackpore" class="p-1.5 capitalize">Barrackpore</option>
+            <option value="baruipur" class="p-1.5 capitalize">Baruipur</option>
+            <option value="calcutta" class="p-1.5 capitalize">Calcutta</option>
+            <option value="dankuni" class="p-1.5 capitalize">Dankuni</option>
+            <option value="durgapur" class="p-1.5 capitalize">Durgapur</option>
+            <option value="haldia" class="p-1.5 capitalize">Haldia</option>
+            <option value="howrah" class="p-1.5 capitalize">Howrah</option>
+            <option value="kalyani" class="p-1.5 capitalize">Kalyani</option>
+            <option value="kolkata" class="p-1.5 capitalize">Kolkata</option>
+            <option value="maldah" class="p-1.5 capitalize">Maldah</option>
+            <option value="raniganj" class="p-1.5 capitalize">Raniganj</option>
+            <option value="sankrail" class="p-1.5 capitalize">Sankrail</option>
+            <option value="siliguri" class="p-1.5 capitalize">Siliguri</option>
+            <option value="uluberia" class="p-1.5 capitalize">Uluberia</option>
+        </select>
+        <div class="rounded-r bg-blue-600 py-2.5 px-3.5">
+            <span class="text-xl text-white">City</span>
+        </div>
+    </div>
+</section>
+
+<section class="p-4 grid grid-cols-3 gap-5">
+    <div class="col-span-2 h-[35rem]">
+        <div id="map" class="rounded-lg shadow h-full"></div>
+    </div>
+    <div class="col-span-1 flex items-center justify-center">
+        <div class="rounded-xl w-3/4 px-5 py-8" style="box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; background: #2BC0E4;
+        background: -webkit-linear-gradient(to right, #EAECC6, #2BC0E4); 
+        background: linear-gradient(to right, #EAECC6, #2BC0E4);
+        ">
+            <div class="text-center font-noto capitalize">
+                <p><i class="fa fa-map-marker text-lg mr-1"></i><span id="city">-</span></p>
+                <p class="text-sm">
+                    <span id="state">-</span>, <span id="country">India</span>
+                </p>
+            </div>
+            <div class="flex flex-col items-center justify-center my-3">
+               <div id="aqi_index_box" class="w-24 h-24 rounded-full bg-my-blue flex items-center justify-center" style="box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;">
+                    <span id="aqi_index" class="text-white text-xl font-noto font-black"></span>
+               </div>
+               <p class="font-noto font-bold capitalize py-2.5 text-sm">air quality index</p>
+               <p class="text-xs text-gray-600 font-bold mb-1.5" id="aqi_dt">-</p>
+               <p class="px-3 py-1 bg-gray-300 rounded-xl uppercase text-sm font-bold" id="aqi_status">Null</p>
+            </div>
+            <div>
+                <p class="font-noto font-semibold capitalize text-xs text-gray-600 text-center mt-3.5 mb-4">AQI trends since last 24 hrs</p>
+                <p class="font-noto text-sm text-center font-semibold capitalize">Prominent pollutant <span class="ml-1 px-3.5 py-0.5 bg-red-200 text-red-700 rounded-xl uppercase text-sm font-black" id="prominent_pollutant">-</span></p>
+                <div class="grid grid-cols-3 gap-3 mt-5">
+                    <div class="text-center">
+                        <p class="font-bold">
+                            <span id="so2">0</span> <span class="text-xs">&mu;g/m<sup>3</sup></span>
+                        </p>
+                        <p class="text-sm text-gray-800 font-semibold mb-0.5">SO<sub>2</sub></p>
+                        <div class="w-full h-1.5 bg-my-white mt-1 rounded-sm">
+                            <div id="so2_bar" class="w-0 h-1.5 bg-my-blue transition-colors duration-200 rounded-sm"></div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <p class="font-bold">
+                            <span id="no2">0</span> <span class="text-xs">&mu;g/m<sup>3</sup></span>
+                        </p>
+                        <p class="text-sm text-gray-800 font-semibold mb-0.5">NO<sub>2</sub></p>
+                        <div class="w-full h-1.5 bg-my-white mt-1 rounded-sm">
+                            <div id="no2_bar" class="w-0 h-1.5 bg-my-blue transition-colors duration-200 rounded-sm"></div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <p class="font-bold">
+                            <span id="pm10">0</span> <span class="text-xs">&mu;g/m<sup>3</sup></span>
+                        </p>
+                        <p class="text-sm text-gray-800 font-semibold mb-0.5">PM 10</p>
+                        <div class="w-full h-1.5 bg-my-white mt-1 rounded-sm">
+                            <div id="pm10_bar" class="w-0 h-1.5 bg-my-blue transition-colors duration-200 rounded-sm"></div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-12">
+    <h3 class="font-bold text-2xl font-noto capitalize text-center">Historic Pollutant data of last 7 days</h3>
+    <div id="historic_aqi_data_chat" class="hidden" style="width:100%; height: 680px"></div>
+    
+    <div class="pt-6 mx-14">
+        <div class="w-full mb-8 overflow-hidden rounded-lg shadow-lg">
+            <div class="w-full overflow-x-auto">
+                <table class="w-full" id="historic_data_table">
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-12">
+    <h3 class="font-bold text-2xl font-noto capitalize text-center">Future Pollutant data prediction for next 7 days</h3>
+    <p class="font-noto lowercase text-center italic">(for now only available for Bidhanagar)</p>
+    <div id="future_aqi_data_chat" class="hidden" style="width:100%; height: 680px"></div>
+    
+    <div class="pt-6 mx-14">
+        <div class="w-full mb-8 overflow-hidden rounded-lg shadow-lg">
+            <div class="w-full overflow-x-auto">
+                <table class="w-full" id="future_data_table">
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="fixed right-0 top-1/2 p-2 bg-slate-300 rounded-l-sm">
+    <div>
+        <div class="flex my-0.5">
+            <div class="h-5 w-5 flex items-center justify-center text-white text-lg rounded-full bg-[#22C55E]"></div>
+            <div class="uppercase font-bold font-noto text-sm ml-0.5">Good</div>
+        </div>
+        <div class="flex my-0.5">
+            <div class="h-5 w-5 flex items-center justify-center text-white text-lg rounded-full bg-[#059669]"></div>
+            <div class="uppercase font-bold font-noto text-sm ml-0.5">fair</div>
+        </div>
+        <div class="flex my-0.5">
+            <div class="h-5 w-5 flex items-center justify-center text-white text-lg rounded-full bg-[#FACC15]"></div>
+            <div class="uppercase font-bold font-noto text-sm ml-0.5">moderate</div>
+        </div>
+        <div class="flex my-0.5">
+            <div class="h-5 w-5 flex items-center justify-center text-white text-lg rounded-full bg-[#F43F5E]"></div>
+            <div class="uppercase font-bold font-noto text-sm ml-0.5">poor</div>
+        </div>
+        <div class="flex my-0.5">
+            <div class="h-5 w-5 flex items-center justify-center text-white text-lg rounded-full bg-[#7E24CE]"></div>
+            <div class="uppercase font-bold font-noto text-sm ml-0.5">hazardous</div>
+        </div>
+    </div>
+</div>
+
+{% include "../blocks/dismissible_alert.html" %}
+
+
+{% block js %}
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="/static/js/location.js"></script>
+<script src="/static/js/aqi_map.js"></script>
+<script src="/static/js/aqi.js"></script>
+{% endblock js %}
+{% endblock body %}
